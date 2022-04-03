@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Background</title>
+    <style>
+        body { margin: 0; }
+    </style>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r99/three.min.js' integrity='sha512-0tlhMhMGPohLm/YwaskxH7jJuUGqU/XPTl+HE0dWrhGbpEBRIZYMQdbHC0CmyNPzZKTBd8JoVZnvMcL7hzlFOg==' crossorigin='anonymous'></script>
+</head>
+<body>
+    <script>
+        
+        // 建立場景
+        const scene = new THREE.Scene();
+        
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.setClearColor(0xeeeeee, 1.0) // 預設背景顏色
+        renderer.shadowMap.enable = true // 陰影效果
+        document.body.appendChild( renderer.domElement );
+
+        // 建立相機
+        const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+        camera.position.set(0, 0, 0) // 相機位置
+        camera.lookAt(scene.position) // 相機焦點
+
+        // 建立座標軸
+        let axis = new THREE.AxisHelper(20);
+        scene.add(axis);
+
+        // 建立物件
+        // 1. 建立環境
+        const textureLoader = new THREE.TextureLoader();
+        const skyboxGeometry = new THREE.BoxGeometry(500, 500, 500)
+        const skyboxMaterials = [ // 順序固定:左右上下前後
+            new THREE.MeshBasicMaterial({ map: textureLoader.load('asset/skybox/rt.png'), side: THREE.DoubleSide }),
+            new THREE.MeshBasicMaterial({ map: textureLoader.load('asset/skybox/lf.png'), side: THREE.DoubleSide }),
+            new THREE.MeshBasicMaterial({ map: textureLoader.load('asset/skybox/up.png'), side: THREE.DoubleSide }),
+            new THREE.MeshBasicMaterial({ map: textureLoader.load('asset/skybox/dn.png'), side: THREE.DoubleSide }),
+            new THREE.MeshBasicMaterial({ map: textureLoader.load('asset/skybox/bk.png'), side: THREE.DoubleSide }),
+            new THREE.MeshBasicMaterial({ map: textureLoader.load('asset/skybox/ft.png'), side: THREE.DoubleSide }),
+        ];
+        skyBox = new THREE.Mesh(skyboxGeometry, skyboxMaterials)
+        skyBox.position.set(0, 0, 0)
+        scene.add(skyBox);
+
+        // 2. 建立物件
+        const geometry = new THREE.BoxGeometry(10, 10, 10);
+        const material = new THREE.MeshBasicMaterial({ 
+            map: textureLoader.load('asset/sea.jpg')
+        });
+        cube = new THREE.Mesh(geometry, material);
+        cube.position.set(50, 0, 30);
+        scene.add(cube);
+
+
+        // 建立光源
+        let spoltLight = new THREE.SpotLight( 'faa' ); //建立聚光燈
+        spoltLight.position.set(100, 100, 100); // 設定光源位置
+        scene.add( spoltLight); //把聚光燈添加到場景
+
+        // 建立動畫
+        const animate = function () {
+            requestAnimationFrame( animate );
+            scene.rotation.y += 0.005;
+            cube.rotation.y -= 0.005;
+            renderer.render( scene, camera );
+		};
+		
+		// RWD設定
+		window.addEventListener('resize', function() {
+			camera.aspect = window.innerWidth / window.innerHeight
+			camera.updateProjectionMatrix()
+			renderer.setSize(window.innerWidth, window.innerHeight)
+		})
+
+        animate();
+    </script>
+</body>
+</html>
